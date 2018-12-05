@@ -19,6 +19,7 @@ package in.cleartax.dropwizard.sharding.hibernate;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import in.cleartax.dropwizard.sharding.utils.ShardMetaInfo;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.util.Duration;
@@ -39,6 +40,9 @@ import java.util.stream.Collectors;
 public class MultiTenantDataSourceFactory {
     @NotEmpty
     private Map<String, DataSourceFactory> tenantDbMap;
+
+    @NotEmpty
+    private Map<String, ShardMetaInfo> shardsMetaInfoMap;
 
     private boolean autoCommentsEnabled = true;
     @NotNull

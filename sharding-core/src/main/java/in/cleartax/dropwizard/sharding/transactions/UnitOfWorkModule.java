@@ -59,6 +59,11 @@ public class UnitOfWorkModule extends AbstractModule {
         @Override
         public Object invoke(MethodInvocation mi) throws Throwable {
             String tenantId = getTenantIdentifier(mi);
+            // reset tenantId to read replica if applicable
+            if(mi.getMethod().isAnnotationPresent(ReadOnlyReplicaIdentifier.class) &&
+                    multiTenantSessionSource.getDataSourceFactory().getShardsMetaInfoMap().get(tenantId).isReadOnlySlaveEnabled) {
+                tenantId = getReadOnlyReplicaTenant(mi, tenantId);
+            }
             Objects.requireNonNull(tenantId, "No tenant-identifier found for this session");
 
             TransactionRunner runner = new TransactionRunner(multiTenantSessionSource.getUnitOfWorkAwareProxyFactory(),
@@ -90,6 +95,17 @@ public class UnitOfWorkModule extends AbstractModule {
 
         private String getDefaultTenant() {
             return multiTenantSessionSource.getDataSourceFactory().getDefaultTenant();
+        }
+
+
+        private String getReadOnlyReplicaTenant(MethodInvocation mi, String masterTenantId) {
+            if (multiTenantSessionSource.getDataSourceFactory().getShardsMetaInfoMap().get(masterTenantId).isReadOnlySlaveEnabled){
+                return masterTenantId;
+            }
+            //currently only default
+            // ToDo: handle more usecases
+            ReadOnlyReplicaIdentifier replicaIdentifier = mi.getMethod().getAnnotation(ReadOnlyReplicaIdentifier.class);
+            return multiTenantSessionSource.getDataSourceFactory().getShardsMetaInfoMap().get(masterTenantId).getDefaultReadOnlySlave();
         }
 
         private boolean isExplicitTenantIdentifierPresent(MethodInvocation mi) {
