@@ -60,7 +60,7 @@ public abstract class TransactionRunner<T> {
             aspect.onError();
         } finally {
             aspect.onFinish();
-            log.info("[DATABASE] transaction={} error={} context={} time-elapsed={}",
+            log.trace("[DATABASE] transaction={} error={} context={} time-elapsed={}",
                     unitOfWork.transactional(), ex != null, context, System.currentTimeMillis() - startTime);
             DelegatingTenantResolver.getInstance().setDelegate(null);
         }
