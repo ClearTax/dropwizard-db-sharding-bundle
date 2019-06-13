@@ -36,18 +36,23 @@ public class DbBasedShardResolver implements ShardResolver {
     private final BucketToShardMappingDAO dao;
 
     @Override
-    @UnitOfWork
-    @TenantIdentifier(useDefault = true)
-    @ReuseSession
     public String resolve(String bucketId) {
         if (bucketShardCache.containsKey(bucketId)) {
             return bucketShardCache.get(bucketId);
         }
+        String shardId = getShardId(bucketId);
+        bucketShardCache.put(bucketId, shardId);
+        return shardId;
+    }
+
+    @UnitOfWork
+    @TenantIdentifier(useDefault = true)
+    @ReuseSession
+    public String getShardId(String bucketId) {
         Optional<String> shardId = dao.getShardId(bucketId);
         if (!shardId.isPresent()) {
             throw new IllegalAccessError(String.format("%s bucket not mapped to any shard", bucketId));
         }
-        bucketShardCache.put(bucketId, shardId.get());
         return shardId.get();
     }
 }
