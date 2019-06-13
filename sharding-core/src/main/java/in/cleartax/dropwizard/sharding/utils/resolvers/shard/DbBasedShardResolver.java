@@ -26,9 +26,12 @@ import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DbBasedShardResolver implements ShardResolver {
+    private ConcurrentMap<String, String> bucketShardCache = new ConcurrentHashMap<>();
 
     private final BucketToShardMappingDAO dao;
 
@@ -37,10 +40,14 @@ public class DbBasedShardResolver implements ShardResolver {
     @TenantIdentifier(useDefault = true)
     @ReuseSession
     public String resolve(String bucketId) {
+        if (bucketShardCache.containsKey(bucketId)) {
+            return bucketShardCache.get(bucketId);
+        }
         Optional<String> shardId = dao.getShardId(bucketId);
         if (!shardId.isPresent()) {
             throw new IllegalAccessError(String.format("%s bucket not mapped to any shard", bucketId));
         }
+        bucketShardCache.put(bucketId, shardId.get());
         return shardId.get();
     }
 }
