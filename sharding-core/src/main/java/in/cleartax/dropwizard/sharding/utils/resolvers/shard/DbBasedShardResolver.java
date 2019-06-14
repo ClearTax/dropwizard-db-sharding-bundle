@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DbBasedShardResolver implements ShardResolver {
-    private ConcurrentMap<String, String> bucketShardCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<String, String> bucketShardCache = new ConcurrentHashMap<>();
 
     private final BucketToShardMappingDAO dao;
 
