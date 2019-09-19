@@ -37,11 +37,11 @@ public abstract class MultiTenantHibernateBundle<T extends Configuration> implem
     private boolean lazyLoadingEnabled = true;
     private boolean registerHealthCheck = false;
 
-    public boolean isregisterHealthCheck() {
+    public boolean isRegisterHealthCheck() {
         return registerHealthCheck;
     }
 
-    public void setregisterHealthCheck(boolean registerHealthCheck) {
+    public void setRegisterHealthCheck(boolean registerHealthCheck) {
         this.registerHealthCheck = registerHealthCheck;
     }
 
