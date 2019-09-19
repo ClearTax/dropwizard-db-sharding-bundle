@@ -35,14 +35,14 @@ public abstract class MultiTenantHibernateBundle<T extends Configuration> implem
     private final MultiTenantSessionFactoryFactory sessionFactoryFactory;
     private SessionFactory sessionFactory;
     private boolean lazyLoadingEnabled = true;
-    private boolean hibernateHealthCheckRegisterEnabled = false;
+    private boolean registerHealthCheck = false;
 
-    public boolean isHibernateHealthCheckRegisterEnabled() {
-        return hibernateHealthCheckRegisterEnabled;
+    public boolean isregisterHealthCheck() {
+        return registerHealthCheck;
     }
 
-    public void setHibernateHealthCheckRegisterEnabled(boolean hibernateHealthCheckRegisterEnabled) {
-        this.hibernateHealthCheckRegisterEnabled = hibernateHealthCheckRegisterEnabled;
+    public void setregisterHealthCheck(boolean registerHealthCheck) {
+        this.registerHealthCheck = registerHealthCheck;
     }
 
     protected MultiTenantHibernateBundle(Class<?> entity, Class<?>... entities) {
@@ -86,7 +86,7 @@ public abstract class MultiTenantHibernateBundle<T extends Configuration> implem
     public final void run(T configuration, Environment environment) {
         final MultiTenantDataSourceFactory dbConfig = getDataSourceFactory(configuration);
         this.sessionFactory = sessionFactoryFactory.build(this, environment, dbConfig, entities, name());
-        if(hibernateHealthCheckRegisterEnabled) {
+        if(registerHealthCheck) {
             environment.healthChecks().register(name(),
                     new MultiTenantSessionFactoryHealthCheck(
                             environment.getHealthCheckExecutorService(),
